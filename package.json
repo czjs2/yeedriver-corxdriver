@@ -1,0 +1,29 @@
+{
+  "name": "yeedriver-corxdriver",
+  "version": "1.0.0",
+  "description": "corx",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/czjs2/yeedriver-corxdriver.git"
+  },
+  "keywords": [
+    "yeedriver",
+    "corx"
+  ],
+  "author": "fx",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/czjs2/yeedriver-corxdriver/issues"
+  },
+  "homepage": "https://github.com/czjs2/yeedriver-corxdriver#readme",
+  "dependencies": {
+    "bluebird": "^3.5.0",
+    "lock": "^0.1.4",
+    "lodash": "^4.17.4",
+    "yeedriver-base": "^1.0.1"
+  }
+}
