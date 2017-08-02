@@ -254,6 +254,7 @@ class CorxGate extends  EventEmitter{
 
                 break;
             case CONN_STATE.connected:
+                console.log(this.mac_id+':connected,ip:'+this.ip)
                 this.error_time = 0;
                 break;
             case CONN_STATE.error_waiting:

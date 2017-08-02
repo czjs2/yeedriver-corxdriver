@@ -50,6 +50,7 @@ CorxDriver.prototype.initDriver = function (options, memories) {
             this.setRunningState(this.RUNNING_STATE.CONNECTED);
             this.setupAutoPoll();
         }
+        // this.checkDeviceChange(true);
     },5000);
 
 
@@ -158,26 +159,33 @@ CorxDriver.prototype.ReadWQ = function (mapItem, devId) {
         return P.reject(`device not exist: ${devId}`);
     }
 };
-CorxDriver.prototype.checkDeviceChange = function () {
-    var addDevices = {};
-    var delDevices = {};
-    let devsInCfg = _.keys(this.rawOptions.sids);
-    let devsFound = _.keys(this.newDevices);
-    let addDevIds = _.reject(devsFound,function(devId){
-            return (_.indexOf(devsInCfg,devId) !== -1);
-    });
-    let delDevIds = _.reject(devsInCfg,(devId)=>{
-        return (_.indexOf(devsFound,devId) !== -1);
-    })
+CorxDriver.prototype.checkDeviceChange = function (isRefresh) {
+    let addDevices = {};
+    let delDevices = {};
+    let sids = _.cloneDeep(this.rawOptions.sids);
 
-
-
-    _.each(addDevIds,  ( devId)=> {
-        addDevices[devId] = this.deviceInfo[devId] || {uniqueId:devId,in:4,out:4};
+    _.each(this.newDevices,(newItem,key)=>{
+        if(!sids[key]&&!isRefresh){
+            addDevices[key] = {
+                address:newItem.address,
+                uniqueId:newItem.uniqueId || "JQD016"
+            }
+        }
+        else {
+            if(newItem.address != sids[key].address){
+                addDevices[key] = sids[key];
+                addDevices[key].address = newItem.address
+            }
+        }
+        delete sids[key];
     });
-    _.each(delDevIds, ( devId)=>{
-        delDevIds[devId] = this.deviceInfo[devId] || {uniqueId:devId,in:4,out:4};
-    });
+
+    if(!isRefresh){
+        _.each(sids,(item,key)=>{
+            delDevIds[key] = "";
+        });
+    }
+
     if (!_.isEmpty(addDevices))
         this.inOrEx({type: "in", devices: addDevices});//uniqueKey:nodeid,uniqueId:nodeinfo.manufacturerid+nodeinfo.productid})
     //console.log('new Devices:',addDevices);
@@ -187,7 +195,7 @@ CorxDriver.prototype.checkDeviceChange = function () {
 };
 CorxDriver.prototype.setInOrEx = function (option) {
     this.enumDevices();
-    setTimeout(this.checkDeviceChange,3000);
+    setTimeout(this.checkDeviceChange.bind(this),3000);
 
 };
 
