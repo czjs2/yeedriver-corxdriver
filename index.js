@@ -34,7 +34,7 @@ CorxDriver.prototype.initDriver = function (options, memories) {
     this.devices = this.devices || {};
 
     _.each(this.rawOptions.sids,(devInfo,devId)=>{
-        let type = devInfo.uniqueId || "JQD016";
+        let type = devInfo.uniqueId || "JDQ016";
         let number = parseInt(type.substr(3)) || 16;
         this.autoReadMaps[devId] = {
             bi_map:[{start:0,end:number-1,len:number}],
@@ -70,7 +70,7 @@ CorxDriver.prototype.enumDevices = function () {
             if(!this.devices[devId]){
                 this.devices[devId] = new Corx(devId);
             }
-            let type = devInfo.uniqueId || "JQD016";
+            let type = devInfo.uniqueId || "JDQ016";
             let number = parseInt(type.substr(3)) || 16;
             this.devices[devId].init(rInfo.address , number, number);
         }
@@ -168,7 +168,7 @@ CorxDriver.prototype.checkDeviceChange = function (isRefresh) {
         if(!sids[key]&&!isRefresh){
             addDevices[key] = {
                 address:newItem.address,
-                uniqueId:newItem.uniqueId || "JQD016"
+                uniqueId:newItem.uniqueId || "JDQ016"
             }
         }
         else {
