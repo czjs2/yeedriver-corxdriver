@@ -40,6 +40,15 @@ CorxDriver.prototype.initDriver = function (options, memories) {
             bi_map:[{start:0,end:number-1,len:number}],
             bq_map:[{start:0,end:number-1,len:number}]
         }
+        if(devInfo.static && devInfo.address &&){
+
+            this.devices[devId] = this.devices[devId] ? this.devices[devId] :  new Corx(devId);
+
+            let type = devInfo.uniqueId || "JDQ016";
+            let number = parseInt(type.substr(3)) || 16;
+            this.devices[devId].init(devInfo.address , number, number);
+
+        }
 
     })
     this.moduleType =options.moduleType || "CorxDriverV1";
@@ -182,7 +191,9 @@ CorxDriver.prototype.checkDeviceChange = function (isRefresh) {
 
     if(!isRefresh){
         _.each(sids,(item,key)=>{
-            delDevIds[key] = "";
+            if(!item.static){
+                delDevIds[key] = "";
+            }
         });
     }
 
