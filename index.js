@@ -40,7 +40,7 @@ CorxDriver.prototype.initDriver = function (options, memories) {
             bi_map:[{start:0,end:number-1,len:number}],
             bq_map:[{start:0,end:number-1,len:number}]
         }
-        if(devInfo.static && devInfo.address &&){
+        if(devInfo.static && devInfo.address){
 
             this.devices[devId] = this.devices[devId] ? this.devices[devId] :  new Corx(devId);
 
