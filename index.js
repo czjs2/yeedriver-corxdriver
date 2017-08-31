@@ -36,10 +36,10 @@ CorxDriver.prototype.initDriver = function (options, memories) {
     _.each(this.rawOptions.sids,(devInfo,devId)=>{
         let type = devInfo.uniqueId || "JDQ016";
         let number = parseInt(type.substr(3)) || 16;
-        this.autoReadMaps[devId] = {
-            bi_map:[{start:0,end:number-1,len:number}],
-            bq_map:[{start:0,end:number-1,len:number}]
-        }
+        // this.autoReadMaps[devId] = {
+        //     bi_map:[{start:0,end:number-1,len:number}],
+        //     bq_map:[{start:0,end:number-1,len:number}]
+        // }
         if(devInfo.static && devInfo.address){
 
             this.devices[devId] = this.devices[devId] ? this.devices[devId] :  new Corx(devId);
@@ -65,9 +65,14 @@ CorxDriver.prototype.initDriver = function (options, memories) {
 
 };
 CorxDriver.prototype.enumDevices = function () {
-    let server = dgram.createSocket('udp4');
     this.newDevices = {};
-    server.on('message', (data, rInfo) => {
+    if(this.enumServer){
+        this.enumServer.close();
+        this.enumServer = null;
+    }
+    this.enumServer = dgram.createSocket('udp4');
+
+    this.enumServer.on('message', (data, rInfo) => {
 
         let devId ="";
         _.each(data.slice(2,7),(item)=>{
@@ -86,8 +91,8 @@ CorxDriver.prototype.enumDevices = function () {
 
 
     })
-    server.bind(60001);
-    server.on('listening', () => {
+    this.enumServer.bind(60001);
+    this.enumServer.on('listening', () => {
         let client = dgram.createSocket('udp4');
         client.bind(function() {
             client.setBroadcast(true);
@@ -111,7 +116,10 @@ CorxDriver.prototype.enumDevices = function () {
 
         }).then(()=>{
             setTimeout( ()=>{
-                server.close();
+                if(this.enumServer){
+                    this.enumServer.close();
+                    this.enumServer = null;
+                }
                 }, 5000);
         }).catch((error)=>{
             console.error('error in enum devices:', error.message || error);
@@ -192,6 +200,7 @@ CorxDriver.prototype.checkDeviceChange = function (isRefresh) {
     if(!isRefresh){
         _.each(sids,(item,key)=>{
             if(!item.static){
+                delDevices[key] = "";
                 delDevices[key] = "";
                 this.devices[key] && this.devices[key].stop();
                 delete this.devices[key];

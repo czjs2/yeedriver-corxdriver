@@ -1,6 +1,6 @@
 {
   "name": "yeedriver-corxdriver",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "corx",
   "main": "index.js",
   "scripts": {
