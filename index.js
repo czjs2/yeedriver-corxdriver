@@ -192,7 +192,9 @@ CorxDriver.prototype.checkDeviceChange = function (isRefresh) {
     if(!isRefresh){
         _.each(sids,(item,key)=>{
             if(!item.static){
-                delDevIds[key] = "";
+                delDevices[key] = "";
+                this.devices[key] && this.devices[key].stop();
+                delete this.devices[key];
             }
         });
     }

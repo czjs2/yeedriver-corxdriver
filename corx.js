@@ -322,6 +322,9 @@ class CorxGate extends  EventEmitter{
 
     }
 
+    stop(){
+        this.enterState(CONN_STATE.deleted)
+    }
 
     writeWq(wq,values){
         return this.writeBQ(wq,values);
