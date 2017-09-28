@@ -31,6 +31,7 @@ class Parser extends  EventEmitter{
 
         }
         this.timeHandler = setTimeout(function(){
+            consle.log(' corx timeout!');
             this.emit('end')
         }.bind(this),this.timeout||2000);
 
@@ -322,6 +323,21 @@ class CorxGate extends  EventEmitter{
 
     }
 
+    createParsers(){
+        this.readBIParser = new  ReadRespParser(2000,(frame)=>{
+            let result = frame.status[0] + (frame.status[1]<<8);
+            for(let i = 0; i < 16;i++){
+                this.in_value[i] = (result & (0x01 << i)) ?true:false;
+            }
+        });
+        this.writeBQParser = new  WriteRespParser();
+        this.readBQParser = new  ReadRespParser(2000,(frame)=>{
+            let result = frame.status[0] + (frame.status[1]<<8);
+            for(let i = 0; i < 16;i++){
+                this.out_value[i] = (result & (0x01 << i)) ?true:false;
+            }
+        });
+    }
     stop(){
         this.enterState(CONN_STATE.deleted)
     }
@@ -335,25 +351,22 @@ class CorxGate extends  EventEmitter{
     }
 
     readBI(biMap){
-        let parser = new  ReadRespParser(2000,(frame)=>{
-            let result = frame.status[0] + (frame.status[1]<<8);
-            for(let i = 0; i < 16;i++){
-                this.in_value[i] = (result & (0x01 << i)) ?true:false;
-            }
-        });
+        let value = Math.random().toPrecision(7);
+        console.log(`readBI ${value}:${new Date().getTime()}`)
         let data = this.buildFrame(0xc0,0x01,[0,0,0x0d]);
-        return this.writeAndWaitResult(data,parser).then(()=>{
+        return this.writeAndWaitResult(data,this.readBIParser).then(()=>{
             let result = [];
             for(let i = biMap.start;i<=biMap.end;i++){
                 result.push(this.in_value[i]);
             }
+            console.log(`readBI ${value}  end:${new Date().getTime()}`)
             return result;
         })
     }
     writeBQ(biMap,values){
-        let parser = new  WriteRespParser();
+
         let write_value = 0x00;
-        for(let i = 0; i++;i<16){
+        for(let i = 0; i<16;i++){
             write_value |= (this.out_value[i]?(0x01 << i):0);
         }
         let write_mask = 0;
@@ -367,33 +380,30 @@ class CorxGate extends  EventEmitter{
             }
         }
         let data = this.buildFrame(0xa1,0x01,[(write_value>>8),write_value&0xFF,(write_mask>>8),write_mask&0xFF]);
-        return this.writeAndWaitResult(data,parser).then(()=>{
+        return this.writeAndWaitResult(data,this.writeBQParser).then(()=>{
             let result = [];
 
         });
     }
     readBQ(biMap){
-        let parser = new  ReadRespParser(2000,(frame)=>{
-            let result = frame.status[0] + (frame.status[1]<<8);
-            for(let i = 0; i < 16;i++){
-                this.out_value[i] = (result & (0x01 << i)) ?true:false;
-            }
-        });
+        let value = Math.random().toPrecision(7);
+        console.log(`readBQ ${value}::${new Date().getTime()}`)
         let data = this.buildFrame(0xB0,0x01,[0,0,0x0d]);
-        return this.writeAndWaitResult(data,parser).then(()=>{
+        return this.writeAndWaitResult(data,this.readBQParser).then(()=>{
             let result = [];
             for(let i = biMap.start;i<=biMap.end;i++) {
                 result.push(this.out_value[i]);
             }
+            console.log(`readBQ ${value}: end:${new Date().getTime()}`)
             return result;
         });
 
     }
 
     writeBP(biMap,values){
-        let parser = new  WriteRespParser();
+
         let write_value = 0x00;
-        for(let i = 0; i++;i<16){
+        for(let i = 0;i<16; i++){
             write_value |= (this.out_value[i]?(0x01 << i):0);
         }
         let write_mask = 0;
@@ -407,7 +417,7 @@ class CorxGate extends  EventEmitter{
             }
         }
         let data = this.buildFrame(0x33,0x01,[(write_value>>8),write_value&0xFF,(write_mask>>8),write_mask&0xFF]);
-        return this.writeAndWaitResult(data,parser).then(()=>{
+        return this.writeAndWaitResult(data,this.writeBQParser).then(()=>{
             let result = [];
 
         });
@@ -440,7 +450,8 @@ class CorxGate extends  EventEmitter{
                     dataparser.init();
                     this.readDataParser = dataparser;
                     this.client.write(new Buffer(sendData));
-                    dataparser.on('end',()=>{
+
+                    dataparser.once('end',()=>{
                         this.readDataParser = null;
                         release(function(){
                             setTimeout(()=>{
