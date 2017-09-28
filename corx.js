@@ -144,7 +144,7 @@ class ReadRespParser extends Parser{
                 this.cur_state = this.READ_STATE.WAIT_END;
                 break;
             case this.READ_STATE.WAIT_END:
-                if(inChar === 0x0D){
+                if(inChar === 0x0D || inChar === 0x00){
                     this.cs1 += inChar;
                     this.cur_state = this.READ_STATE.WAIT_CS1
                 }
@@ -194,7 +194,7 @@ class CorxGate extends  EventEmitter{
 // data是服务器发回的数据
         this.client.on('data', (data) =>{
 
-           // console.log('DATA: ' + JSON.stringify(data));
+            //console.log('DATA: ' + JSON.stringify(data));
             // 完全关闭连接
 
             if(this.readDataParser){
@@ -387,6 +387,7 @@ class CorxGate extends  EventEmitter{
             }
             return result;
         });
+
     }
 
     writeBP(biMap,values){
@@ -442,7 +443,10 @@ class CorxGate extends  EventEmitter{
                     dataparser.on('end',()=>{
                         this.readDataParser = null;
                         release(function(){
-                            resolve();
+                            setTimeout(()=>{
+                                resolve();
+                            },50);
+
                         })();
                     })
                 })
