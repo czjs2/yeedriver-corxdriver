@@ -352,6 +352,9 @@ class CorxGate extends  EventEmitter{
     }
 
     readBI(biMap){
+        if(this.cur_state !== CONN_STATE.connected){
+            return P.resolve([]);
+        }
         let value = Math.random().toPrecision(7);
         console.log(`readBI ${value}:${new Date().getTime()}`)
         let data = this.buildFrame(0xc0,0x01,[0,0,0x0d]);
@@ -365,6 +368,9 @@ class CorxGate extends  EventEmitter{
         })
     }
     writeBQ(biMap,values){
+        if(this.cur_state !== CONN_STATE.connected){
+            return P.reject(`corx ${this.mac_id} not connected`);
+        }
 
         let write_value = 0x00;
         for(let i = 0; i<16;i++){
@@ -387,6 +393,9 @@ class CorxGate extends  EventEmitter{
         });
     }
     readBQ(biMap){
+        if(this.cur_state !== CONN_STATE.connected){
+            return P.resolve([]);
+        }
         let value = Math.random().toPrecision(7);
         console.log(`readBQ ${value}::${new Date().getTime()}`)
         let data = this.buildFrame(0xB0,0x01,[0,0,0x0d]);
@@ -402,7 +411,9 @@ class CorxGate extends  EventEmitter{
     }
 
     writeBP(biMap,values){
-
+        if(this.cur_state !== CONN_STATE.connected){
+            return P.reject(`corx ${this.mac_id} not connected`);
+        }
         let write_value = 0x00;
         for(let i = 0;i<16; i++){
             write_value |= (this.out_value[i]?(0x01 << i):0);
