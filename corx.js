@@ -353,7 +353,7 @@ class CorxGate extends  EventEmitter{
 
     readBI(biMap){
         if(this.cur_state !== CONN_STATE.connected){
-            return P.resolve([]);
+            return P.reject(`corx ${this.mac_id} not connected`);
         }
         let value = Math.random().toPrecision(7);
         console.log(`readBI ${value}:${new Date().getTime()}`)
@@ -394,7 +394,7 @@ class CorxGate extends  EventEmitter{
     }
     readBQ(biMap){
         if(this.cur_state !== CONN_STATE.connected){
-            return P.resolve([]);
+            return P.reject(`corx ${this.mac_id} not connected`);
         }
         let value = Math.random().toPrecision(7);
         console.log(`readBQ ${value}::${new Date().getTime()}`)
