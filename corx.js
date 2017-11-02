@@ -31,7 +31,7 @@ class Parser extends  EventEmitter{
 
         }
         this.timeHandler = setTimeout(function(){
-            consle.log(' corx timeout!');
+            console.log(' corx timeout!');
             this.emit('end')
         }.bind(this),this.timeout||2000);
 
