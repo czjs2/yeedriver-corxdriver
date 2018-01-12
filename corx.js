@@ -356,14 +356,14 @@ class CorxGate extends  EventEmitter{
             return P.reject(`corx ${this.mac_id} not connected`);
         }
         let value = Math.random().toPrecision(7);
-        console.log(`readBI ${value}:${new Date().getTime()}`)
+        // console.log(`readBI ${value}:${new Date().getTime()}`)
         let data = this.buildFrame(0xc0,0x01,[0,0,0x0d]);
         return this.writeAndWaitResult(data,this.readBIParser).then(()=>{
             let result = [];
             for(let i = biMap.start;i<=biMap.end;i++){
                 result.push(this.in_value[i]);
             }
-            console.log(`readBI ${value}  end:${new Date().getTime()}`)
+            // console.log(`readBI ${value}  end:${new Date().getTime()}`)
             return result;
         })
     }
@@ -397,14 +397,14 @@ class CorxGate extends  EventEmitter{
             return P.reject(`corx ${this.mac_id} not connected`);
         }
         let value = Math.random().toPrecision(7);
-        console.log(`readBQ ${value}::${new Date().getTime()}`)
+        // console.log(`readBQ ${value}::${new Date().getTime()}`)
         let data = this.buildFrame(0xB0,0x01,[0,0,0x0d]);
         return this.writeAndWaitResult(data,this.readBQParser).then(()=>{
             let result = [];
             for(let i = biMap.start;i<=biMap.end;i++) {
                 result.push(this.out_value[i]);
             }
-            console.log(`readBQ ${value}: end:${new Date().getTime()}`)
+            // console.log(`readBQ ${value}: end:${new Date().getTime()}`)
             return result;
         });
 
